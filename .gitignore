@@ -1,0 +1,14 @@
+/db/*.sqlite3
+/db/*.sqlite3-journal
+/log/*
+/tmp/*
+mkmf.log
+
+/.bundle
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
+._*
+*.tmproj
