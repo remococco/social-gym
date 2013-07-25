@@ -5,18 +5,19 @@ class Api::RegistrationsController < ApplicationController
     user = User.new(user_params)
     
     if user.save
-      render :json => { :email => user.email, :auth_token => user.authentication_token }.to_json, :status => 201
+      user.ensure_authentication_token!
+      render :json => { :email => user.email, :auth_token => user.authentication_token }.to_json, :success => true, :status => 201
       return
     else
       warden.custom_failure!
-      render :json=> user.errors, :status => 422
+      render :json => { :error => "Cannot create user with given credentials" }.to_json, :success => false, :status => 422
     end
   end
   
+private
+
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation)
+    params.require(:user).permit(:email, :password)
   end
-  
-  private :user_params
 
 end
