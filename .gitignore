@@ -3,6 +3,7 @@
 /log/*
 /tmp/*
 mkmf.log
+coverage
 
 /.bundle
 *~
