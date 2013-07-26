@@ -2,12 +2,16 @@ require 'spec_helper'
 
 describe Api::RegistrationsController do
   
+  before :each do
+    warden_stubs
+  end
+  
   describe 'api sign up' do
   
     before :each do
-      @email = 'testing@gmail.com'
-      json = { :user => { :email => @email, :password => 'password' } }
-      response = post(:create, json)
+      user_attrs = FactoryGirl.attributes_for(:user)
+      @email = user_attrs[:email]
+      response = post(:create, { :user => user_attrs })
       @contents = JSON.parse(response.body)
     end
   
@@ -34,13 +38,10 @@ describe Api::RegistrationsController do
   describe 'invalid api sign up' do
   
     before :each do
-      # TODO refactor this out
-      allow_message_expectations_on_nil()
-      request.env['warden'].stub(:custom_failure!)
-      
-      @email = 'testing@gmail.com'
-      json = { :user => { :email => @email, :password => nil } }
-      response = post(:create, json)
+      user_attrs = FactoryGirl.attributes_for(:user)
+      user_attrs[:password] = nil
+      @email = user_attrs[:email]
+      response = post(:create, { :user => user_attrs })
       @contents = JSON.parse(response.body)
     end
     
