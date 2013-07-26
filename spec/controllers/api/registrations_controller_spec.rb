@@ -11,12 +11,12 @@ describe Api::RegistrationsController do
     before :each do
       user_attrs = FactoryGirl.attributes_for(:user)
       @email = user_attrs[:email]
-      response = post(:create, { :user => user_attrs })
-      @contents = JSON.parse(response.body)
+      @response = post(:create, { :user => user_attrs })
+      @contents = JSON.parse(@response.body)
     end
   
     it 'should sign up new users with a valid json request' do
-      success = response.success?
+      success = @response.success?
 
       expect(success).to be_true
     end
@@ -38,15 +38,14 @@ describe Api::RegistrationsController do
   describe 'invalid api sign up' do
   
     before :each do
-      user_attrs = FactoryGirl.attributes_for(:user)
-      user_attrs[:password] = nil
+      user_attrs = FactoryGirl.attributes_for(:user, :password => nil)
       @email = user_attrs[:email]
-      response = post(:create, { :user => user_attrs })
-      @contents = JSON.parse(response.body)
+      @response = post(:create, { :user => user_attrs })
+      @contents = JSON.parse(@response.body)
     end
     
     it 'should not sign up users with invalid json request' do
-      success = response.success?
+      success = @response.success?
       
       expect(success).to be_false
     end

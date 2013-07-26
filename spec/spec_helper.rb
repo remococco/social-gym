@@ -1,15 +1,17 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 
 # Configure code coverage tool
-require 'simplecov'
+if ENV["COVERAGE"]
+  require 'simplecov'
 
-SimpleCov.start do
-  add_filter "/spec/"
-  add_filter "/config/"
+  SimpleCov.start do
+    add_filter "/spec/"
+    add_filter "/config/"
   
-  add_group "Models", "app/models"
-  add_group "Controllers", "app/controllers"
-  add_group "Helpers", "app/helpers"
+    add_group "Models", "app/models"
+    add_group "Controllers", "app/controllers"
+    add_group "Helpers", "app/helpers"
+  end
 end
 
 ENV["RAILS_ENV"] ||= 'test'
@@ -54,5 +56,7 @@ RSpec.configure do |config|
   config.order = "random"
   
   config.include WardenHelper
+  config.include DeviseHelper
+  config.include Devise::TestHelpers
   
 end
