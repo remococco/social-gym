@@ -1,7 +1,7 @@
 class Api::RegistrationsController < ApplicationController
   respond_to :json
   
-  def create
+  def create    
     user = User.new(user_params)
     
     if user.save

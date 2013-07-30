@@ -8,49 +8,61 @@ describe Api::SessionsController do
 
   describe 'api sign in' do
     
-    before :each do
-      @user_attrs = FactoryGirl.attributes_for(:user)
-      @user = User.create(@user_attrs)
-      @email = @user_attrs[:email]
-      @response = post(:create, @user_attrs)
-      @contents = JSON.parse(@response.body)
-    end
+    describe 'should sign in' do
     
-    it 'should sign in a valid user' do
-      success = @response.success?
-      
-      expect(success).to be_true
-    end
+      before :each do
+        user_attrs = FactoryGirl.attributes_for(:user)
+        User.create user_attrs
+        @email = user_attrs[:email]
+        post :create, user_attrs
+        @contents = JSON.parse(response.body)
+      end
     
-    it 'should have the correct email' do
-      email = @contents['email']
+      it 'should sign in a valid user' do
+        success = response.success?
+        expect(success).to be_true
+      end
+    
+      it 'should have the correct email' do
+        email = @contents['email']
+        expect(email).to eq(@email)
+      end
   
-      expect(email).to eq(@email)
-    end
-  
-    it 'should give a valid token' do
-      token = @contents['auth_token']
-     
-      expect(token).not_to be_nil
+      it 'should give a valid token' do
+        token = @contents['auth_token']
+        expect(token).not_to be_nil
+      end
+    
     end
     
     describe 'should not sign in' do
+      
+      before :each do
+        @user_attrs = FactoryGirl.attributes_for(:user)
+        User.create @user_attrs
+      end
+      
+      it 'with no email param' do
+        @user_attrs[:email] = nil
+        post :create, @user_attrs
+        
+        success = response.success?
+        expect(success).to be_false
+      end
     
       it 'with invalid email' do
         @user_attrs[:email] = "bademail@email.com"
-        @response = post(:create, @user_attrs)
-        @contents = JSON.parse(@response.body)
+        post :create, @user_attrs
         
-        success = @response.success?
+        success = response.success?
         expect(success).to be_false
       end
     
       it 'with invalid password' do
         @user_attrs[:password] = "wrongpassword"
-        @response = post(:create, @user_attrs)
-        @contents = JSON.parse(@response.body)
+        post :create, @user_attrs
         
-        success = @response.success?
+        success = response.success?
         expect(success).to be_false
       end
     
@@ -59,19 +71,42 @@ describe Api::SessionsController do
   end
   
   describe 'api sign out' do
-    
-    before :each do
+
+    it 'should not be accessible without a token' do
+      delete :destroy
+      
+      success = response.success?
+      expect(success).to be_false
     end
     
-    it 'should not be accessible by a non signed in session' do
-      user_attrs = FactoryGirl.attributes_for(:user)
-      user = User.create user_attrs
+    it 'should not be accessible with an incorrect token' do
+      user = FactoryGirl.create(:user)
       user.ensure_authentication_token!
-
-      response = delete(:destroy)#, :auth_token => user.authentication_token)
-      contents = JSON.parse(response.body)
+      delete :destroy, :auth_token => "#{user.authentication_token}#{user.authentication_token}"
       
-      $stderr.puts contents
+      success = response.success?
+      expect(success).to be_false
+    end
+    
+    describe 'success' do
+      
+      before :each do
+        @user = FactoryGirl.create(:user)
+        @user.ensure_authentication_token!
+        @auth_token = @user.authentication_token
+        delete :destroy, :auth_token => @user.authentication_token
+      end
+      
+      it 'should sign out' do
+        success = response.success?
+        expect(success).to be_true
+      end
+      
+      it 'should reset auth token on valid sign out' do
+        token_after_sign_out = User.find(@user).authentication_token
+        expect(@auth_token).not_to eq(token_after_sign_out)
+      end
+    
     end
     
   end
