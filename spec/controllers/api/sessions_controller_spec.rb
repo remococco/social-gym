@@ -81,7 +81,6 @@ describe Api::SessionsController do
     
     it 'should not be accessible with an incorrect token' do
       user = FactoryGirl.create(:user)
-      user.ensure_authentication_token!
       delete :destroy, :auth_token => "#{user.authentication_token}#{user.authentication_token}"
       
       success = response.success?
@@ -92,7 +91,6 @@ describe Api::SessionsController do
       
       before :each do
         @user = FactoryGirl.create(:user)
-        @user.ensure_authentication_token!
         @auth_token = @user.authentication_token
         delete :destroy, :auth_token => @user.authentication_token
       end
