@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable
          
   has_many :friendships
-  has_many :friends, :through => :friendships, :conditions => "status = 'confirmed'"
-  has_many :requested_friends, :through => :friendships, :source => :friend, :conditions => "status = 'requested'"
-  has_many :pending_friends, :through => :friendships, :source => :friend, :conditions => "status = 'pending'"
+  has_many :friends, -> { where :status => 'confirmed' }, :through => :friendships
+  has_many :requested_friends, -> { where :status => 'requested' }, :through => :friendships, :source => :friend
+  has_many :pending_friends, -> { where :status => 'pending' }, :through => :friendships, :source => :friend
 end

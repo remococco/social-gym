@@ -48,7 +48,7 @@ class Api::FriendshipsController < ApplicationController
     end
   end
 
-  def destory
+  def destroy
     if current_user.friendships.find_by_friend_id(params[:friend_id]).nil?
       render :json => { :error => "That user and friend do not have a friendship" }.to_json, 
              :success => false, 
