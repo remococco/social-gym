@@ -1,3 +1,3 @@
-A social gym app. Workouts are better when your not alone!
+A social gym app. Workouts are better when you're not alone!
 
 A json API backend.
